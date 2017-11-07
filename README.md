@@ -7,6 +7,7 @@ Create a Ubuntu 16.04 VM w static private IP address
 Install Docker
 https://docs.docker.com/engine/installation/linux/docker-ce/ubuntu/
 
+```
 sudo -i
 apt-get update
 apt-get install apt-transport-https ca-certificates curl software-properties-common
@@ -17,6 +18,7 @@ apt-cache show docker-ce
 apt-get install docker-ce=17.06.*
 docker version
 docker run hello-world
+```
 
 Azure network group inbound port configuration
 
@@ -40,34 +42,39 @@ Install WS1709 with Containers from MarketPlace
 Use same network security group as above
 
 Install EE Preview
-
+```
 stop-service docker
-uninstall-package dockerdefault
+uninstall-package docker -PackageProvider DockerMsftProvider
+
 Install-Module DockerProvider
 Install-Package Docker -Providername DockerProvider -RequiredVersion preview
+```
+* Sometimes the package name is DefaultDocker?
 
-Set daemon to use hyper-v isolation
+Set daemon to use hyper-v isolation and enable debug logging
 https://docs.microsoft.com/en-us/virtualization/windowscontainers/deploy-containers/version-compatibility
 
 Create c:\ProgramData\docker\config\daemon.json
 
 {
-    "exec-opts":["isolation=hyperv"]
+    "exec-opts":["isolation=hyperv"],
+    "debug": true    
 }
-
-start-service docker
+```
+dockerd
 docker version
+```
 
 Install UCP agent and run script
 
+```
 docker image pull docker/ucp-agent-win:2.2.4
 docker image pull docker/ucp-dsinfo-win:2.2.4
 docker container run --rm docker/ucp-agent-win:2.2.4 windows-script | powershell -noprofile -noninteractive -command 'Invoke-Expression -Command $input'
-
-PS C:\programdata\docker\config> docker container run --rm docker/ucp-agent-win:2.2.4 windows-script | powershell -noprofile -noninteractive -command 'Invoke-Expression -Command $input'
+```
 
 Warning in output
-
+```
 Testing for required windows updates  = [System.Version]::Parse 10.0.16299.15  = [System.Version]::Parse 10.0.14393.1066 if False       Write-Host "System is missing a required update. Please check windows updates or apply this KB4015217: http://www.catalog.update.microsoft.com/Search.aspx?q=KB4015217 before adding this node to your UCP cluster" -ForegroundColor yellow  Write-Host Setting up Docker daemon to listen on port 2376 with TLS
 
 Generating new certs at C:\ProgramData\docker\daemoncerts
@@ -78,19 +85,16 @@ Opening port 12376 in the Windows firewall for inbound traffic
 Opening port 2377 in the Windows firewall for inbound traffic
 Opening port 4789 in the Windows firewall for inbound and outbound traffic
 Opening port 7946 in the Windows firewall for inbound and outbound traffic
-
+```
 join swarm via URL from UCP
 
 UCP agent logs feature not working for 1709 workers
 
 Deploy a service
-
+```
 docker network create <overlay1>
 docker service create --name t1 --replicas 3 --network overlay1 -p 8080:80 --constraint node.platform.os==windows microsoft/iis:1709
-
-1709 VMs fail per swarm and UCP and cannot be accessed via RDP
-
-Up next
+```
 
 One worker instead of two
 Eliminate overlay network (ingress only)
@@ -100,7 +104,7 @@ docker service create --name t1 --replicas 1 -p 8080:80 --constraint node.platfo
 ------------
 
 iptables configuration - not needed
-
+```
 #!/bin/bash
 
 ports='443 12386 12387 12379 12385 12376 12384 12381 12383 12380 2376 2377 12382 12386 4789 7946'
@@ -112,5 +116,5 @@ do
 done
 iptables-save > /etc/iptables.conf
 add iptables-restore /etc/iptables.conf to /etc/rc.local
-
+```
 
