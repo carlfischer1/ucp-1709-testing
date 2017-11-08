@@ -91,8 +91,8 @@ UCP agent logs feature not working for 1709 workers
 
 ----------
 
-# Mixed swarm VIP testing
-
+# VIP testing with Server 1709
+## Mixed swarm
 Create a 3 node swarm with an Ubuntu 16.04 master and 2 x Windows Server 1709 workers
 Create a dockerfile to run IIS
 ```
@@ -127,11 +127,13 @@ Find a container ID for each task (run on workers)
 docker ps --format "{{.ID}}: {{.Names}}"
 ```
 
-Verify connectiviy via VIP on overlay network. On worker running a task for service s1:
+Verify connectiviy between services s1 and s2 via VIP on overlay network. On worker running a task for service s1:
 ```
 docker exec -it <ID of s1 container> powershell
 Invoke-WebRequest -Uri http://<VIP of s2> -UseBasicParsing
-
+```
+Results in a failure:
+```
 Invoke-WebRequest : Unable to connect to the remote server
 At line:1 char:1
 + Invoke-WebRequest -Uri http://10.0.0.3 -UseBasicParsing
@@ -141,36 +143,59 @@ At line:1 char:1
     + FullyQualifiedErrorId : WebCmdletWebResponseException,Microsoft.PowerShell.Commands.InvokeWebRequestCommand
 ```
 
-# Native Windows swarm VIP testing
+## Native Windows swarm
 Create a 2 node Windows Server 1709 swarm
 Use above image
-Use above commands to create overlay network, deploy services, and verify connectivity
+Use above commands to create overlay network, and deploy services
 
-
-
-
+```
+docker exec -it <ID of s1 container> powershell
+Invoke-WebRequest -Uri http://<VIP of s2> -UseBasicParsing
+```
+Returns a ```200``` from the default IIS website:
+```
+StatusCode        : 200
+StatusDescription : OK
+Content           : <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+                    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+                    <html xmlns="http://www.w3.org/1999/xhtml">
+                    <head>
+                    <meta http-equiv="Content-Type" cont...
+RawContent        : HTTP/1.1 200 OK
+                    Accept-Ranges: bytes
+                    Content-Length: 703
+                    Content-Type: text/html
+                    Date: Wed, 08 Nov 2017 02:01:14 GMT
+                    ETag: "f2f79a40d951d31:0"
+                    Last-Modified: Mon, 30 Oct 2017 23:46:05 GMT
+                    Serve...
+Forms             :
+Headers           : {[Accept-Ranges, bytes], [Content-Length, 703], [Content-Type, text/html], [Date, Wed, 08 Nov 2017
+                    02:01:14 GMT]...}
+Images            : {@{outerHTML=<img src="iisstart.png" alt="IIS" width="960" height="600" />; tagName=IMG;
+                    src=iisstart.png; alt=IIS; width=960; height=600}}
+InputFields       : {}
+Links             : {@{outerHTML=<a href="http://go.microsoft.com/fwlink/?linkid=66138&amp;clcid=0x409"><img
+                    src="iisstart.png" alt="IIS" width="960" height="600" /></a>; tagName=A;
+                    href=http://go.microsoft.com/fwlink/?linkid=66138&amp;clcid=0x409}}
+ParsedHtml        :
+RawContentLength  : 703
+```
 
 ------------
-
 Opening ports in Windows firewall
-
 ```
 netsh firewall add portopening TCP 2377 "Port 2377"
 netsh firewall add portopening TCP 2376 "Port 2376"
 netsh firewall add portopening TCP 7496 "Port 7496"
-
 ```
-
 ------------
-
 Tailing docker daemon logs on Ubuntu
 ```
 journalctl -f -u docker.service
 ```
-
 ------------
-
-iptables configuration - not needed
+iptables configuration
 ```
 #!/bin/bash
 
