@@ -94,32 +94,12 @@ UCP agent logs feature not working for 1709 workers
 # VIP testing with Server 1709
 ## Mixed swarm
 Create a 3 node swarm with an Ubuntu 16.04 master and 2 x Windows Server 1709 workers
-Create a dockerfile to run IIS
-```
-FROM microsoft\iis
-EXPOSE 80
-```
-
-Build and push
-```
-docker build .
-docker tag <image ID> carlfischer/cfiis
-docker login --username carlfischer
-docker push carlfischer/cfiis
-```
-See https://github.com/docker/saas-mega/issues/3389. To workaround, build the image on both Windows workers.
 
 Deploy two services, each will get a VIP address
 ```
 docker network create overlay1 --driver overlay
-docker service create --name s1 --replicas 2 --network overlay1 --constraint node.platform.os==windows carlfischer/cfiis
-docker service create --name s2 --replicas 2 --network overlay1 --constraint node.platform.os==windows carlfischer/cfiis
-```
-
-Find the VIP addresses for each service
-```
-docker service inspect s1
-docker service inspect s2
+docker service create --name s1 --replicas 2 --network overlay1 --constraint node.platform.os==windows microsoft/iis
+docker service create --name s2 --replicas 2 --network overlay1 --constraint node.platform.os==windows microsoft/iis
 ```
 
 Find a container ID for each task (run on workers)
@@ -130,27 +110,29 @@ docker ps --format "{{.ID}}: {{.Names}}"
 Verify connectiviy between services s1 and s2 via VIP on overlay network. On worker running a task for service s1:
 ```
 docker exec -it <ID of s1 container> powershell
-Invoke-WebRequest -Uri http://<VIP of s2> -UseBasicParsing
+Invoke-WebRequest -Uri http://s2 -UseBasicParsing
 ```
 Results in a failure:
 ```
 Invoke-WebRequest : Unable to connect to the remote server
 At line:1 char:1
-+ Invoke-WebRequest -Uri http://10.0.0.3 -UseBasicParsing
++ Invoke-WebRequest -Uri http://s2 -UseBasicParsing
 + ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     + CategoryInfo          : InvalidOperation: (System.Net.HttpWebRequest:HttpWebRequest) [Invoke-WebRequest], WebExc
    eption
     + FullyQualifiedErrorId : WebCmdletWebResponseException,Microsoft.PowerShell.Commands.InvokeWebRequestCommand
 ```
+The same test but using the VIP IP address directly also fails.
 
 ## Native Windows swarm
 Create a 2 node Windows Server 1709 swarm
 Use above image
 Use above commands to create overlay network, and deploy services
 
+Verify connectiviy between services s1 and s2 via VIP on overlay network. On worker running a task for service s1:
 ```
 docker exec -it <ID of s1 container> powershell
-Invoke-WebRequest -Uri http://<VIP of s2> -UseBasicParsing
+Invoke-WebRequest -Uri http://s2 -UseBasicParsing
 ```
 Returns a ```200``` from the default IIS website:
 ```
@@ -183,6 +165,11 @@ RawContentLength  : 703
 ```
 
 ------------
+Find the VIP addresses for a service
+```
+docker service inspect s1
+```
+------------
 Opening ports in Windows firewall
 ```
 netsh firewall add portopening TCP 2377 "Port 2377"
@@ -209,4 +196,21 @@ done
 iptables-save > /etc/iptables.conf
 add iptables-restore /etc/iptables.conf to /etc/rc.local
 ```
+------------
+Create a wrapper image to run IIS
+```
+FROM microsoft\iis
+EXPOSE 80
+```
+
+Build and push
+```
+docker build .
+docker tag <image ID> carlfischer/cfiis
+docker login --username carlfischer
+docker push carlfischer/cfiis
+```
+See https://github.com/docker/saas-mega/issues/3389. To workaround, build the image on both Windows workers.
+
+
 
