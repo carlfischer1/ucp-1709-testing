@@ -1,4 +1,4 @@
-# ucp-1709-testing
+# UCP with Server 1709 testing
 
 UCP on Azure
 
