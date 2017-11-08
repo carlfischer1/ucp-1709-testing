@@ -91,7 +91,7 @@ UCP agent logs feature not working for 1709 workers
 
 ----------
 
-Mixed swarm VIP testing
+# Mixed swarm VIP testing
 
 Create a 3 node swarm with an Ubuntu 16.04 master and 2 x Windows Server 1709 workers
 Create a dockerfile to run IIS
@@ -112,8 +112,8 @@ See https://github.com/docker/saas-mega/issues/3389. To workaround, build the im
 Deploy two services, each will get a VIP address
 ```
 docker network create overlay1 --driver overlay
-docker service create --name s1 --replicas 2 --constraint node.platform.os==windows carlfischer/cfiis
-docker service create --name s2 --replicas 2 --constraint node.platform.os==windows carlfischer/cfiis
+docker service create --name s1 --replicas 2 --network overlay1 --constraint node.platform.os==windows carlfischer/cfiis
+docker service create --name s2 --replicas 2 --network overlay1 --constraint node.platform.os==windows carlfischer/cfiis
 ```
 
 Find the VIP addresses for each service
@@ -127,12 +127,42 @@ Find a container ID for each task (run on workers)
 docker ps --format "{{.ID}}: {{.Names}}"
 ```
 
-Verify connectiviy via VIP on overlay network
+Verify connectiviy via VIP on overlay network. On worker running a task for service s1:
 ```
+docker exec -it <ID of s1 container> powershell
+Invoke-WebRequest -Uri http://<VIP of s2> -UseBasicParsing
+
+Invoke-WebRequest : Unable to connect to the remote server
+At line:1 char:1
++ Invoke-WebRequest -Uri http://10.0.0.3 -UseBasicParsing
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : InvalidOperation: (System.Net.HttpWebRequest:HttpWebRequest) [Invoke-WebRequest], WebExc
+   eption
+    + FullyQualifiedErrorId : WebCmdletWebResponseException,Microsoft.PowerShell.Commands.InvokeWebRequestCommand
 ```
+
+# Native Windows swarm VIP testing
+Create a 2 node Windows Server 1709 swarm
+Use above image
+Use above commands to create overlay network, deploy services, and verify connectivity
+
+
+
 
 
 ------------
+
+Opening ports in Windows firewall
+
+```
+netsh firewall add portopening TCP 2377 "Port 2377"
+netsh firewall add portopening TCP 2376 "Port 2376"
+netsh firewall add portopening TCP 7496 "Port 7496"
+
+```
+
+------------
+
 Tailing docker daemon logs on Ubuntu
 ```
 journalctl -f -u docker.service
