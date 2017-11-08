@@ -93,7 +93,9 @@ UCP agent logs feature not working for 1709 workers
 
 # VIP testing with Server 1709
 ## Mixed swarm
-Create a 3 node swarm with an Ubuntu 16.04 master and 2 x Windows Server 1709 workers
+Create a 3 node swarm 
+* 1 x Ubuntu 16.04 master running Docker EE 17.06
+* 2 x Windows Server 1709 workers running EE Preview-3.
 
 Deploy two services, each will get a VIP address
 ```
@@ -112,7 +114,7 @@ Verify connectiviy between services s1 and s2 via VIP on overlay network. On wor
 docker exec -it <ID of s1 container> powershell
 Invoke-WebRequest -Uri http://s2 -UseBasicParsing
 ```
-Results in a failure:
+When the Linux master is running 17.06 the following failure occurs. When running 17.10 the operation succeeds as expected.
 ```
 Invoke-WebRequest : Unable to connect to the remote server
 At line:1 char:1
@@ -125,7 +127,7 @@ At line:1 char:1
 The same test but using the VIP IP address directly also fails.
 
 ## Native Windows swarm
-Create a 2 node Windows Server 1709 swarm
+Create a 2 node Windows Server 1709 swarm running EE Preview-3
 Use above image
 Use above commands to create overlay network, and deploy services
 
