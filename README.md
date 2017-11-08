@@ -129,7 +129,7 @@ Create a 2 node Windows Server 1709 swarm
 Use above image
 Use above commands to create overlay network, and deploy services
 
-Verify connectiviy between services s1 and s2 via VIP on overlay network. On worker running a task for service s1:
+Verify connectivity between services s1 and s2 via VIP on overlay network. On worker running a task for service s1:
 ```
 docker exec -it <ID of s1 container> powershell
 Invoke-WebRequest -Uri http://s2 -UseBasicParsing
