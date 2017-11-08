@@ -44,16 +44,14 @@ Use same network security group as above
 Install EE Preview
 ```
 stop-service docker
-uninstall-package docker -PackageProvider DockerMsftProvider
+uninstall-package Docker -PackageProvider DockerMsftProvider
 
 Install-Module DockerProvider
 Install-Package Docker -Providername DockerProvider -RequiredVersion preview
 ```
-* Sometimes the package name is DefaultDocker?
-
-Set daemon to use hyper-v isolation and enable debug logging
+For use with Windows Server 2016 (RS1) images set daemon to use hyper-v isolation
 https://docs.microsoft.com/en-us/virtualization/windowscontainers/deploy-containers/version-compatibility
-
+```
 Create c:\ProgramData\docker\config\daemon.json
 
 {
@@ -61,7 +59,8 @@ Create c:\ProgramData\docker\config\daemon.json
     "debug": true    
 }
 ```
-dockerd
+```
+dockerd -D
 docker version
 ```
 
@@ -90,16 +89,54 @@ join swarm via URL from UCP
 
 UCP agent logs feature not working for 1709 workers
 
-Deploy a service
+----------
+
+Mixed swarm VIP testing
+
+Create a 3 node swarm with an Ubuntu 16.04 master and 2 x Windows Server 1709 workers
+Create a dockerfile to run IIS
 ```
-docker network create <overlay1>
-docker service create --name t1 --replicas 3 --network overlay1 -p 8080:80 --constraint node.platform.os==windows microsoft/iis:1709
+FROM microsoft\iis
+EXPOSE 80
 ```
 
-One worker instead of two
-Eliminate overlay network (ingress only)
-Start with one replica and scale up
-docker service create --name t1 --replicas 1 -p 8080:80 --constraint node.platform.os==windows microsoft/iis:1709
+Build and push
+```
+docker build .
+docker tag <image ID> carlfischer/cfiis
+docker login --username carlfischer
+docker push carlfischer/cfiis
+```
+See https://github.com/docker/saas-mega/issues/3389. To workaround, build the image on both Windows workers.
+
+Deploy two services, each will get a VIP address
+```
+docker network create overlay1 --driver overlay
+docker service create --name s1 --replicas 2 --constraint node.platform.os==windows carlfischer/cfiis
+docker service create --name s2 --replicas 2 --constraint node.platform.os==windows carlfischer/cfiis
+```
+
+Find the VIP addresses for each service
+```
+docker service inspect s1
+docker service inspect s2
+```
+
+Find a container ID for each task (run on workers)
+```
+docker ps --format "{{.ID}}: {{.Names}}"
+```
+
+Verify connectiviy via VIP on overlay network
+```
+```
+
+
+------------
+Tailing docker daemon logs on Ubuntu
+```
+journalctl -f -u docker.service
+```
 
 ------------
 
