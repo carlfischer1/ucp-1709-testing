@@ -3,6 +3,14 @@
 UCP on Azure
 
 Create a Ubuntu 16.04 VM w static private IP address
+Create new network security group with required inbound ports
+
+443
+2376-2377
+4789
+7946
+12376,12379
+12380-12387
 
 Install Docker
 https://docs.docker.com/engine/installation/linux/docker-ce/ubuntu/
@@ -20,15 +28,6 @@ docker version
 docker run hello-world
 ```
 
-Azure network group inbound port configuration
-
-443
-2376-2377
-4789
-7946
-12376,12379
-12380-12387
-
 Install UCP
 
 https://docs.docker.com/datacenter/ucp/2.2/guides/admin/install/ 
@@ -36,9 +35,8 @@ Host address = resource group subnet (ie 172.16.8.6)
 Licenses pinned to #product-ee channel
 Add public IP to SAN list
 
-WS1709 worker
+Create "WS1709 with Containers" VM from Azure MarketPlace
 
-Install WS1709 with Containers from MarketPlace
 Use same network security group as above
 
 Install EE Preview
@@ -72,7 +70,11 @@ docker image pull docker/ucp-dsinfo-win:2.2.4
 docker container run --rm docker/ucp-agent-win:2.2.4 windows-script | powershell -noprofile -noninteractive -command 'Invoke-Expression -Command $input'
 ```
 
-Warning in output
+Add Windows node in UCP and join swarm via provided URL
+
+### Known issues
+
+1 - Warning in UCP windows-script output
 ```
 Testing for required windows updates  = [System.Version]::Parse 10.0.16299.15  = [System.Version]::Parse 10.0.14393.1066 if False       Write-Host "System is missing a required update. Please check windows updates or apply this KB4015217: http://www.catalog.update.microsoft.com/Search.aspx?q=KB4015217 before adding this node to your UCP cluster" -ForegroundColor yellow  Write-Host Setting up Docker daemon to listen on port 2376 with TLS
 
@@ -85,9 +87,8 @@ Opening port 2377 in the Windows firewall for inbound traffic
 Opening port 4789 in the Windows firewall for inbound and outbound traffic
 Opening port 7946 in the Windows firewall for inbound and outbound traffic
 ```
-join swarm via URL from UCP
 
-UCP agent logs feature not working for 1709 workers
+2 - UCP agent logs feature not working for 1709 workers
 
 ----------
 
@@ -95,7 +96,7 @@ UCP agent logs feature not working for 1709 workers
 ## Mixed swarm
 Create a 3 node swarm 
 * 1 x Ubuntu 16.04 master running Docker EE 17.06
-* 2 x Windows Server 1709 workers running EE Preview-3.
+* 2 x Windows Server 1709 workers running EE Preview-3
 
 Deploy two services, each will get a VIP address
 ```
