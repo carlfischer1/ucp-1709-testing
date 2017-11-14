@@ -166,6 +166,15 @@ ParsedHtml        :
 RawContentLength  : 703
 ```
 
+#Ingress publishing testing with Server 1709
+## Mixed swarm
+
+```docker service create --name s3 --replicas 2 --network overlay1 -p 8080:80 --constraint node.platform.os==windows microsoft/iis
+```
+Ensure port 8080 is open in Azure network security group used by the VMs in the swarm
+Browse to ```http://<Public IP address of any VM in the swarm>:8080```
+Default IIS website should be displayed
+
 ------------
 Find the VIP addresses for a service
 ```
