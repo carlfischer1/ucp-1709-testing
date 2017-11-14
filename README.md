@@ -1,10 +1,10 @@
-# Server 1709 testing
+# Server 1709 testing on Azure
 
 ## UCP
 
 Create a Ubuntu 16.04 VM w static private IP address
 
-Create new network security group with required inbound ports
+Create new network security group with required inbound ports:
 
 443
 
@@ -18,7 +18,7 @@ Create new network security group with required inbound ports
 
 12380-12387
 
-## Install Docker
+### Install Docker
 https://docs.docker.com/engine/installation/linux/docker-ce/ubuntu/
 
 ```
@@ -34,7 +34,7 @@ docker version
 docker run hello-world
 ```
 
-## Install UCP
+### Install UCP
 
 https://docs.docker.com/datacenter/ucp/2.2/guides/admin/install/ 
 
@@ -42,7 +42,7 @@ Host address = resource group subnet (ie 172.*)
 
 Add public IP to SAN list
 
-## Create WS1709 worker
+### Create WS1709 worker
 Create "WS1709 with Containers" VM from Azure MarketPlace
 
 Use same network security group as above
@@ -82,7 +82,7 @@ docker container run --rm docker/ucp-agent-win:2.2.4 windows-script | powershell
 
 Add Windows node in UCP and join swarm via provided URL
 
-## Known issues
+### Known issues
 
 1 - Warning in UCP windows-script output
 ```
