@@ -3,16 +3,22 @@
 UCP on Azure
 
 Create a Ubuntu 16.04 VM w static private IP address
+
 Create new network security group with required inbound ports
 
 443
+
 2376-2377
+
 4789
+
 7946
+
 12376,12379
+
 12380-12387
 
-Install Docker
+## Install Docker
 https://docs.docker.com/engine/installation/linux/docker-ce/ubuntu/
 
 ```
@@ -28,13 +34,15 @@ docker version
 docker run hello-world
 ```
 
-Install UCP
+## Install UCP
 
 https://docs.docker.com/datacenter/ucp/2.2/guides/admin/install/ 
-Host address = resource group subnet (ie 172.16.8.6)
-Licenses pinned to #product-ee channel
+
+Host address = resource group subnet (ie 172.*)
+
 Add public IP to SAN list
 
+## Create WS1709 worker
 Create "WS1709 with Containers" VM from Azure MarketPlace
 
 Use same network security group as above
@@ -48,7 +56,9 @@ Install-Module DockerProvider
 Install-Package Docker -Providername DockerProvider -RequiredVersion preview
 ```
 For use with Windows Server 2016 (RS1) images set daemon to use hyper-v isolation
+
 https://docs.microsoft.com/en-us/virtualization/windowscontainers/deploy-containers/version-compatibility
+
 ```
 Create c:\ProgramData\docker\config\daemon.json
 
@@ -72,7 +82,7 @@ docker container run --rm docker/ucp-agent-win:2.2.4 windows-script | powershell
 
 Add Windows node in UCP and join swarm via provided URL
 
-### Known issues
+## Known issues
 
 1 - Warning in UCP windows-script output
 ```
@@ -95,7 +105,9 @@ Opening port 7946 in the Windows firewall for inbound and outbound traffic
 # VIP testing with Server 1709
 ## Mixed swarm
 Create a 3 node swarm 
+
 * 1 x Ubuntu 16.04 master running Docker EE 17.06
+
 * 2 x Windows Server 1709 workers running EE Preview-3
 
 Deploy two services, each will get a VIP address
@@ -129,7 +141,9 @@ The same test but using the VIP IP address directly also fails.
 
 ## Native Windows swarm
 Create a 2 node Windows Server 1709 swarm running EE Preview-3
+
 Use above image
+
 Use above commands to create overlay network, and deploy services
 
 Verify connectivity between services s1 and s2 via VIP on overlay network. On worker running a task for service s1:
@@ -167,15 +181,18 @@ ParsedHtml        :
 RawContentLength  : 703
 ```
 
-#Ingress publishing testing with Server 1709
+# Ingress publishing testing with Server 1709
 ## Mixed swarm
 
 ```docker service create --name s3 --replicas 2 --network overlay1 -p 8080:80 --constraint node.platform.os==windows microsoft/iis
 ```
 Ensure port 8080 is open in Azure network security group used by the VMs in the swarm
+
 Browse to ```http://<Public IP address of any VM in the swarm>:8080```
+
 Default IIS website should be displayed
 
+# Background 
 ------------
 Find the VIP addresses for a service
 ```
