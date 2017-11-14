@@ -1,6 +1,6 @@
-# UCP with Server 1709 testing
+# Server 1709 testing
 
-UCP on Azure
+## UCP
 
 Create a Ubuntu 16.04 VM w static private IP address
 
@@ -14,7 +14,7 @@ Create new network security group with required inbound ports
 
 7946
 
-12376,12379
+12376, 12379
 
 12380-12387
 
@@ -102,7 +102,7 @@ Opening port 7946 in the Windows firewall for inbound and outbound traffic
 
 ----------
 
-# VIP testing with Server 1709
+# VIP service discovery
 ## Mixed swarm
 Create a 3 node swarm 
 
@@ -181,12 +181,16 @@ ParsedHtml        :
 RawContentLength  : 703
 ```
 
-# Ingress publishing testing with Server 1709
+# Ingress service publishing
 ## Mixed swarm
 
-```docker service create --name s3 --replicas 2 --network overlay1 -p 8080:80 --constraint node.platform.os==windows microsoft/iis
-```
 Ensure port 8080 is open in Azure network security group used by the VMs in the swarm
+
+Create service
+
+```
+docker service create --name s3 --replicas 2 --network overlay1 -p 8080:80 --constraint node.platform.os==windows microsoft/iis
+```
 
 Browse to ```http://<Public IP address of any VM in the swarm>:8080```
 
