@@ -100,6 +100,9 @@ Opening port 7946 in the Windows firewall for inbound and outbound traffic
 
 2 - UCP agent logs feature not working for 1709 workers
 
+3 - After shutdown and restart of cluster all 1709 nodes show red, with status of "Awaiting healthy status in classic node inventory". All nodes are shown as Ready in ```docker node ls```
+
+
 ----------
 
 # VIP service discovery
