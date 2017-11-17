@@ -63,8 +63,7 @@ https://docs.microsoft.com/en-us/virtualization/windowscontainers/deploy-contain
 Create c:\ProgramData\docker\config\daemon.json
 
 {
-    "exec-opts":["isolation=hyperv"],
-    "debug": true    
+    "exec-opts":["isolation=hyperv"]
 }
 ```
 ```
