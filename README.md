@@ -201,10 +201,10 @@ Default IIS website should be displayed
 # DNSRR service discovery
 ## Native Windows swarm
 
-In a two node Windows swarm, create overlay network and services
+In a three node Windows swarm, create overlay network and services
 ```
 docker network create overlay2 --driver overlay
-docker service create --name s4 --replicas 2 --network overlay2 --endpoint-mode dnsrr --constraint node.platform.os==windows microsoft/iis
+docker service create --name s4 --replicas 3 --network overlay2 --endpoint-mode dnsrr --constraint node.platform.os==windows microsoft/iis
 ```
 
 Verify that a task of the service is running on each node
@@ -212,6 +212,7 @@ Verify that a task of the service is running on each node
 docker service ps s4 --filter desired-state=Running --format "{{.ID}}: {{.Name}}: {{.Node}}"
 ba4yv41drrc9: s4.1: 1709-3
 i0a4oa0mmv7d: s4.2: 1709-4
+ju0890skj24k: s4.3: 1709-5
 ```
 
 Find a container running a task of the service (only containers for tasks running on that node will be returned)
@@ -220,15 +221,35 @@ docker ps --format "{{.ID}}: {{.Names}}"
 e69fffa58401: s4.1.ba4yv41drrc9e4zker0isx4xl
 ```
 
-Verify DNSRR for service s4 on the overlay network. DNS resolution should include an IP address for each task of the service:
+Verify DNSRR for service s4 on the overlay network. DNS resolution should include an IP address for each task of the service, with the order of IP addresses changing across multiple queries:
 ```
 docker exec -it <ID of s4 container> powershell
-Resolve-DnsName "s4"
+
+PS C:\> Resolve-DnsName -Name s4 -DnsOnly
 
 Name                                           Type   TTL   Section    IPAddress
 ----                                           ----   ---   -------    ---------
-s4                                             A      600   Answer     10.0.0.9
-s4                                             A      600   Answer     10.0.0.8
+s4                                             A      600   Answer     10.0.0.5
+s4                                             A      600   Answer     10.0.0.4
+s4                                             A      600   Answer     10.0.0.7
+
+
+PS C:\> Resolve-DnsName -Name s4 -DnsOnly
+
+Name                                           Type   TTL   Section    IPAddress
+----                                           ----   ---   -------    ---------
+s4                                             A      600   Answer     10.0.0.4
+s4                                             A      600   Answer     10.0.0.7
+s4                                             A      600   Answer     10.0.0.5
+
+
+PS C:\> Resolve-DnsName -Name s4 -DnsOnly
+
+Name                                           Type   TTL   Section    IPAddress
+----                                           ----   ---   -------    ---------
+s4                                             A      600   Answer     10.0.0.7
+s4                                             A      600   Answer     10.0.0.4
+s4                                             A      600   Answer     10.0.0.5
 ```
 
 Ping each IP address returned from DNS to verify connectivity across tasks in the cluster.
