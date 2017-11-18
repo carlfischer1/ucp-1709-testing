@@ -198,6 +198,36 @@ Browse to ```http://<Public IP address of any VM in the swarm>:8080```
 
 Default IIS website should be displayed
 
+# DNSRR service discovery
+## Native Windows swarm
+
+In a two node Windows swarm, create overlay network and services
+```
+docker network create overlay2 --driver overlay
+docker service create --name s4 --replicas 2 --network overlay2 --endpoint-mode dnsrr --constraint node.platform.os==windows microsoft/iis
+```
+
+Ensure a task of the service is running on each node
+```
+docker service ps s4
+```
+
+Find a container for a task of the service
+```
+docker ps --format "{{.ID}}: {{.Names}}"
+```
+
+Verify DNSRR for service s4 on the overlay network. DNS resolution should include an IP address for each task of the service:
+```
+docker exec -it <ID of s4 container> powershell
+Resolve-DnsName "s4"
+
+Name                                           Type   TTL   Section    IPAddress
+----                                           ----   ---   -------    ---------
+s4                                             A      600   Answer     10.0.0.9
+s4                                             A      600   Answer     10.0.0.8
+```
+
 # Background 
 ------------
 Find the VIP addresses for a service
