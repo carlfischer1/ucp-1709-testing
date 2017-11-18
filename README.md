@@ -210,14 +210,14 @@ docker service create --name s4 --replicas 2 --network overlay2 --endpoint-mode 
 Verify that a task of the service is running on each node
 ```
 docker service ps s4 --filter desired-state=Running --format "{{.ID}}: {{.Name}}: {{.Node}}"
-
 ba4yv41drrc9: s4.1: 1709-3
 i0a4oa0mmv7d: s4.2: 1709-4
 ```
 
-Find a container for a task of the service
+Find a container running a task of the service (only containers for tasks running on that node will be returned)
 ```
 docker ps --format "{{.ID}}: {{.Names}}"
+e69fffa58401: s4.1.ba4yv41drrc9e4zker0isx4xl
 ```
 
 Verify DNSRR for service s4 on the overlay network. DNS resolution should include an IP address for each task of the service:
