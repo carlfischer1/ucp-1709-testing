@@ -207,9 +207,12 @@ docker network create overlay2 --driver overlay
 docker service create --name s4 --replicas 2 --network overlay2 --endpoint-mode dnsrr --constraint node.platform.os==windows microsoft/iis
 ```
 
-Ensure a task of the service is running on each node
+Verify that a task of the service is running on each node
 ```
-docker service ps s4
+docker service ps s4 --filter desired-state=Running --format "{{.ID}}: {{.Name}}: {{.Node}}"
+
+ba4yv41drrc9: s4.1: 1709-3
+i0a4oa0mmv7d: s4.2: 1709-4
 ```
 
 Find a container for a task of the service
@@ -227,6 +230,8 @@ Name                                           Type   TTL   Section    IPAddress
 s4                                             A      600   Answer     10.0.0.9
 s4                                             A      600   Answer     10.0.0.8
 ```
+
+Ping each IP address returned from DNS to verify connectivity across tasks in the cluster.
 
 # Background 
 ------------
