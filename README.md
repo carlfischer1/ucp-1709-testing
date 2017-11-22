@@ -34,6 +34,12 @@ docker version
 docker run hello-world
 ```
 
+Alternatively, to get the latest Edge channel version of Docker CE
+```
+curl -fsSL get.docker.com > get-docker.sh
+sh get-docker.sh
+```
+
 ### Install UCP
 
 https://docs.docker.com/datacenter/ucp/2.2/guides/admin/install/ 
@@ -50,7 +56,7 @@ Use same network security group as above
 Install EE Preview
 ```
 stop-service docker
-uninstall-package Docker -PackageProvider DockerMsftProvider
+uninstall-package Docker -Provider DockerMsftProvider
 
 Install-Module DockerProvider
 Install-Package Docker -Providername DockerProvider -RequiredVersion preview
@@ -273,6 +279,13 @@ Tailing docker daemon logs on Ubuntu
 journalctl -f -u docker.service
 ```
 ------------
+Tailing docker daemon logs on Windows
+```
+dockerd -D > log.txt
+Get-Content .\log.txt -Wait
+```
+------------
+
 iptables configuration
 ```
 #!/bin/bash
@@ -303,5 +316,10 @@ docker push carlfischer/cfiis
 ```
 See https://github.com/docker/saas-mega/issues/3389. To workaround, build the image on both Windows workers.
 
+------------
+Alternate method to get Windows version
+```
+cmd /c ver
+```
 
 
