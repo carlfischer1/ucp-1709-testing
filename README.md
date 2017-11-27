@@ -73,8 +73,10 @@ Create c:\ProgramData\docker\config\daemon.json
 }
 ```
 ```
-dockerd -D
+restart-computer
+...
 docker version
+docker info
 ```
 
 Install UCP agent and run script
