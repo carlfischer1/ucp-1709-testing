@@ -324,4 +324,14 @@ Alternate method to get Windows version
 cmd /c ver
 ```
 
-
+------------
+Tailing logs on Windows
+```
+$lastCheck = (Get-Date).AddSeconds(-2) 
+while ($true) 
+{ 
+    Get-EventLog Application -Source docker -After $lastcheck |% { $_.TimeGenerated.ToString() + ': ' + $_.ReplacementStrings }
+    $lastCheck = Get-Date 
+    Start-Sleep -Seconds 2
+}
+```
