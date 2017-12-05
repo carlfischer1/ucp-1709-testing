@@ -325,7 +325,7 @@ cmd /c ver
 ```
 
 ------------
-Tailing logs on Windows
+Tailing dockerd event logs on Windows
 ```
 $lastCheck = (Get-Date).AddSeconds(-2) 
 while ($true) 
