@@ -280,6 +280,12 @@ Tailing docker daemon logs on Ubuntu
 ```
 journalctl -f -u docker.service
 ```
+
+or
+```
+tail -f /var/log/upstart/docker.log
+```
+
 ------------
 Tailing docker daemon logs on Windows
 ```
