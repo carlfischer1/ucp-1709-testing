@@ -1,0 +1,152 @@
+```
+root@ubuntu-1:~# docker service ls
+ID                  NAME                MODE                REPLICAS            IMAGE                          PORTS
+devvvei6yx67        service1            replicated          0/0                 microsoft/nanoserver:latest    
+lq0fjil9t9z8        ucp-agent           global              1/1                 docker/ucp-agent:2.2.4         
+oii0io6z4xl3        ucp-agent-s390x     global              0/0                 docker/ucp-agent-s390x:2.2.4   
+3pg2thbu7ggj        ucp-agent-win       global              1/1                 docker/ucp-agent-win:2.2.4     
+root@ubuntu-1:~# docker service inspect dev
+[
+    {
+        "ID": "devvvei6yx67cznr7sofz5xhe",
+        "Version": {
+            "Index": 18146
+        },
+        "CreatedAt": "2018-01-03T22:26:47.463951061Z",
+        "UpdatedAt": "2018-01-03T22:41:39.67927577Z",
+        "Spec": {
+            "Name": "service1",
+            "Labels": {
+                "com.docker.ucp.access.label": "/",
+                "com.docker.ucp.collection": "swarm",
+                "com.docker.ucp.collection.root": "true",
+                "com.docker.ucp.collection.swarm": "true"
+            },
+            "TaskTemplate": {
+                "ContainerSpec": {
+                    "Image": "microsoft/nanoserver:latest@sha256:3331d7e40d93e8a3ea617450701a4f6550c699a673348b82fdc6fc01b9c44500",
+                    "Labels": {
+                        "com.docker.ucp.access.label": "/",
+                        "com.docker.ucp.collection": "swarm",
+                        "com.docker.ucp.collection.root": "true",
+                        "com.docker.ucp.collection.swarm": "true"
+                    },
+                    "Command": [
+                        "powershell"
+                    ],
+                    "StopGracePeriod": 0,
+                    "DNSConfig": {}
+                },
+                "Resources": {
+                    "Limits": {},
+                    "Reservations": {}
+                },
+                "RestartPolicy": {
+                    "Condition": "any",
+                    "Delay": 5000000000,
+                    "MaxAttempts": 0
+                },
+                "Placement": {
+                    "Constraints": [
+                        "node.labels.com.docker.ucp.windows.ver == 10.0.14393.1770",
+                        "node.labels.com.docker.ucp.collection.swarm==true"
+                    ],
+                    "Platforms": [
+                        {
+                            "Architecture": "amd64",
+                            "OS": "windows"
+                        }
+                    ]
+                },
+                "ForceUpdate": 0,
+                "Runtime": "container"
+            },
+            "Mode": {
+                "Replicated": {
+                    "Replicas": 0
+                }
+            },
+            "UpdateConfig": {
+                "Parallelism": 1,
+                "FailureAction": "pause",
+                "Monitor": 5000000000,
+                "MaxFailureRatio": 0,
+                "Order": "stop-first"
+            },
+            "RollbackConfig": {
+                "Parallelism": 1,
+                "FailureAction": "pause",
+                "Monitor": 5000000000,
+                "MaxFailureRatio": 0,
+                "Order": "stop-first"
+            },
+            "EndpointSpec": {
+                "Mode": "vip"
+            }
+        },
+        "PreviousSpec": {
+            "Name": "service1",
+            "Labels": {
+                "com.docker.ucp.access.label": "/",
+                "com.docker.ucp.collection": "swarm",
+                "com.docker.ucp.collection.root": "true",
+                "com.docker.ucp.collection.swarm": "true"
+            },
+            "TaskTemplate": {
+                "ContainerSpec": {
+                    "Image": "microsoft/nanoserver:latest@sha256:3331d7e40d93e8a3ea617450701a4f6550c699a673348b82fdc6fc01b9c44500",
+                    "Labels": {
+                        "com.docker.ucp.access.label": "/",
+                        "com.docker.ucp.collection": "swarm",
+                        "com.docker.ucp.collection.root": "true",
+                        "com.docker.ucp.collection.swarm": "true"
+                    },
+                    "Command": [
+                        "powershell"
+                    ],
+                    "StopGracePeriod": 0
+                },
+                "Resources": {
+                    "Limits": {},
+                    "Reservations": {}
+                },
+                "RestartPolicy": {
+                    "Condition": "any",
+                    "MaxAttempts": 0
+                },
+                "Placement": {
+                    "Constraints": [
+                        "node.labels.com.docker.ucp.windows.ver == 10.0.14393.1770",
+                        "node.labels.com.docker.ucp.collection.swarm==true"
+                    ],
+                    "Platforms": [
+                        {
+                            "Architecture": "amd64",
+                            "OS": "windows"
+                        }
+                    ]
+                },
+                "ForceUpdate": 0,
+                "Runtime": "container"
+            },
+            "Mode": {
+                "Replicated": {
+                    "Replicas": 2
+                }
+            },
+            "UpdateConfig": {
+                "Parallelism": 1,
+                "FailureAction": "pause",
+                "MaxFailureRatio": 0,
+                "Order": "stop-first"
+            },
+            "EndpointSpec": {
+                "Mode": "vip"
+            }
+        },
+        "Endpoint": {
+            "Spec": {}
+        }
+    }
+]
+```
