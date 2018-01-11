@@ -325,9 +325,16 @@ docker push carlfischer/cfiis
 See https://github.com/docker/saas-mega/issues/3389. To workaround, build the image on both Windows workers.
 
 ------------
-Alternate method to get Windows version
+Methods to get Windows version
+
+Doesn't return UBR pre-1709
 ```
 cmd /c ver
+```
+
+Works across versions
+```
+Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion"
 ```
 
 ------------
