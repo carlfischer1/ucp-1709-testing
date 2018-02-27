@@ -373,3 +373,16 @@ Image: library/hello-world
    - windows/amd64:10.0.16299.125
    ```
 
+------------
+Working with DTR
+
+Uses same lic file as UCP
+
+Configuring insecure registries: https://docs.docker.com/registry/insecure/
+
+```docker login <your_dtr>```
+```docker pull library/python:3.6.4-windowsservercore-ltsc2016```
+```docker tag python:3.6.4-windowsservercore-ltsc2016 <your_dtr>/<your_user>/python:3.6.4-windowsservercore-10.0.14393.2068```
+```docker push <your_dtr>/<your_user>/python:3.6.4-windowsservercore-10.0.14393.2068```
+
+```FROM <your_dtr>/<your_user>/python:3.6.4-windowsservercore-10.0.14393.2068```
